@@ -23,6 +23,21 @@
       },
       "category": "productivity",
       "tags": ["overheid", "standaarden", "interoperabiliteit", "api", "digikoppeling"]
+    },
+    {
+      "name": "zad-actions",
+      "description": "Skills voor ZAD deployment: linting, releases en GitHub Actions validatie voor Zelfservice voor Applicatie Deployment",
+      "version": "1.0.0",
+      "author": {
+        "name": "Rijks ICT Gilde",
+        "email": "ictgilde@minbzk.nl"
+      },
+      "source": {
+        "source": "github",
+        "repo": "RijksICTGilde/zad-actions"
+      },
+      "category": "productivity",
+      "tags": ["zad", "deployment", "github-actions", "linting", "release"]
     }
   ]
 }

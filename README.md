@@ -29,6 +29,7 @@ claude plugin install logius-standaarden@overheid-plugins
 | Plugin | Beschrijving | Maintainer |
 |--------|-------------|------------|
 | [logius-standaarden](https://github.com/MinBZK/logius-standaarden-plugin) | 10 skills voor 88 Logius standaarden repositories (API Design Rules, Digikoppeling, OAuth NL, FSC, CloudEvents, BOMOS, en meer) | Logius |
+| [zad-actions](https://github.com/RijksICTGilde/zad-actions) | 3 skills voor ZAD deployment: linting, releases en GitHub Actions validatie | Rijks ICT Gilde |
 
 ## Plugin toevoegen
 
