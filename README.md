@@ -1,7 +1,7 @@
 # Overheid Claude Plugins
 
 [![EUPL-1.2](https://img.shields.io/badge/licentie-EUPL--1.2-blue.svg)](LICENSE)
-[![plugins](https://img.shields.io/badge/plugins-2-green.svg)](#beschikbare-plugins)
+[![plugins](https://img.shields.io/badge/plugins-3-green.svg)](#beschikbare-plugins)
 [![CI](https://github.com/MinBZK/overheid-claude-plugins/actions/workflows/validate.yml/badge.svg)](https://github.com/MinBZK/overheid-claude-plugins/actions/workflows/validate.yml)
 
 Centrale catalogus van [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugins voor de Nederlandse overheid. Via deze marketplace kunnen overheidsteams hun Claude Code plugins publiceren en ontdekken.
@@ -22,6 +22,7 @@ claude plugin install logius-standaarden@overheid-plugins
 |--------|--------|-------------|------------|
 | [logius-standaarden](https://github.com/MinBZK/logius-standaarden-plugin) | 10 | Skills voor 88 Logius standaarden repositories: API Design Rules, Digikoppeling, OAuth NL, FSC, CloudEvents, BOMOS, en meer | [Logius](https://github.com/logius-standaarden) |
 | [zad-actions](https://github.com/RijksICTGilde/zad-actions) | 5 | Skills voor ZAD deployment: linting, releases, action validatie, workflow generatie en debugging | [Rijks ICT Gilde](https://github.com/RijksICTGilde) |
+| [developer-overheid](https://github.com/dstotijn/developer-overheid-nl-agent-skills) | 9 | Kennisbank van developer.overheid.nl: richtlijnen en standaarden voor overheidssoftwareontwikkeling (API's, data, frontend, infra, security, open source) | [David Stotijn](https://github.com/dstotijn) |
 
 ## Plugin toevoegen
 

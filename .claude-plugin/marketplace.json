@@ -38,6 +38,21 @@
       },
       "category": "productivity",
       "tags": ["zad", "deployment", "github-actions", "linting", "release", "debugging", "workflow"]
+    },
+    {
+      "name": "developer-overheid",
+      "description": "Kennisbank van developer.overheid.nl: richtlijnen en standaarden voor overheidssoftwareontwikkeling (API's, data, frontend, infra, security, open source)",
+      "version": "0.1.0",
+      "author": {
+        "name": "David Stotijn",
+        "email": ""
+      },
+      "source": {
+        "source": "github",
+        "repo": "dstotijn/developer-overheid-nl-agent-skills"
+      },
+      "category": "productivity",
+      "tags": ["overheid", "developer", "api", "security", "open-source", "nl-design-system", "standaarden"]
     }
   ]
 }
