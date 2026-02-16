@@ -1,0 +1,152 @@
+name: Valideer marketplace
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Valideer marketplace.json syntax
+        run: python3 -c "import json; json.load(open('.claude-plugin/marketplace.json'))"
+
+      - name: Valideer marketplace structuur
+        run: |
+          python3 << 'SCRIPT'
+          import json, sys
+
+          with open('.claude-plugin/marketplace.json') as f:
+              data = json.load(f)
+
+          errors = []
+
+          # Verplichte velden
+          for field in ['name', 'owner', 'plugins']:
+              if field not in data:
+                  errors.append(f"Verplicht veld '{field}' ontbreekt")
+
+          if 'owner' in data and 'name' not in data['owner']:
+              errors.append("Verplicht veld 'owner.name' ontbreekt")
+
+          # Plugins validatie
+          names = []
+          for i, plugin in enumerate(data.get('plugins', [])):
+              prefix = f"plugins[{i}]"
+              if 'name' not in plugin:
+                  errors.append(f"{prefix}: 'name' ontbreekt")
+              else:
+                  if plugin['name'] in names:
+                      errors.append(f"{prefix}: dubbele plugin-naam '{plugin['name']}'")
+                  names.append(plugin['name'])
+              if 'source' not in plugin:
+                  errors.append(f"{prefix}: 'source' ontbreekt")
+
+          if errors:
+              for e in errors:
+                  print(f"FOUT: {e}")
+              sys.exit(1)
+
+          print(f"Marketplace '{data['name']}' is geldig ({len(data['plugins'])} plugins)")
+          SCRIPT
+
+      - name: Controleer plugin-repos bereikbaar
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 << 'SCRIPT'
+          import json, subprocess, sys
+
+          with open('.claude-plugin/marketplace.json') as f:
+              data = json.load(f)
+
+          errors = []
+          for plugin in data.get('plugins', []):
+              source = plugin.get('source', {})
+              if isinstance(source, dict):
+                  if source.get('source') == 'github':
+                      repo = source.get('repo', '')
+                  elif source.get('source') == 'url':
+                      url = source.get('url', '')
+                      # Extract owner/repo from GitHub URL
+                      if 'github.com' in url:
+                          repo = url.split('github.com/')[-1].replace('.git', '')
+                      else:
+                          print(f"SKIP: {plugin['name']} - geen GitHub URL, handmatig controleren")
+                          continue
+                  else:
+                      continue
+              else:
+                  continue
+
+              result = subprocess.run(
+                  ['gh', 'api', f'repos/{repo}', '--jq', '.full_name'],
+                  capture_output=True, text=True
+              )
+              if result.returncode != 0:
+                  errors.append(f"{plugin['name']}: repo '{repo}' niet bereikbaar")
+              else:
+                  print(f"OK: {plugin['name']} -> {result.stdout.strip()}")
+
+          if errors:
+              for e in errors:
+                  print(f"FOUT: {e}")
+              sys.exit(1)
+
+          print("Alle plugin-repos bereikbaar")
+          SCRIPT
+
+      - name: Controleer plugin.json aanwezig in repos
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 << 'SCRIPT'
+          import json, subprocess, sys
+
+          with open('.claude-plugin/marketplace.json') as f:
+              data = json.load(f)
+
+          errors = []
+          for plugin in data.get('plugins', []):
+              source = plugin.get('source', {})
+              if isinstance(source, dict) and source.get('source') == 'github':
+                  repo = source['repo']
+              elif isinstance(source, dict) and source.get('source') == 'url':
+                  url = source.get('url', '')
+                  if 'github.com' in url:
+                      repo = url.split('github.com/')[-1].replace('.git', '')
+                  else:
+                      continue
+              else:
+                  continue
+
+              result = subprocess.run(
+                  ['gh', 'api', f'repos/{repo}/contents/.claude-plugin/plugin.json', '--jq', '.name'],
+                  capture_output=True, text=True
+              )
+              if result.returncode != 0:
+                  errors.append(f"{plugin['name']}: .claude-plugin/plugin.json niet gevonden in {repo}")
+              else:
+                  print(f"OK: {plugin['name']} heeft plugin.json")
+
+          if errors:
+              for e in errors:
+                  print(f"FOUT: {e}")
+              sys.exit(1)
+
+          print("Alle plugins hebben een geldig manifest")
+          SCRIPT
+
+      - name: Controleer vereiste bestanden
+        run: |
+          for f in LICENSE README.md CONTRIBUTING.md CHANGELOG.md .claude-plugin/marketplace.json; do
+            if [ ! -f "$f" ]; then
+              echo "FOUT: $f ontbreekt"
+              exit 1
+            fi
+          done
+          echo "Alle vereiste bestanden aanwezig"

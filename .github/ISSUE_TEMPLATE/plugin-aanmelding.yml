@@ -1,0 +1,89 @@
+name: Plugin aanmelding
+description: Meld een nieuwe Claude Code plugin aan voor de marketplace
+title: "[Plugin] "
+labels: ["plugin-aanmelding"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Bedankt voor het aanmelden van je plugin! Vul onderstaande gegevens in zodat we je plugin kunnen reviewen.
+
+  - type: input
+    id: plugin-name
+    attributes:
+      label: Plugin naam
+      description: De naam zoals in je plugin.json (kebab-case)
+      placeholder: mijn-plugin
+    validations:
+      required: true
+
+  - type: input
+    id: repo-url
+    attributes:
+      label: Repository URL
+      description: Publieke GitHub repository URL
+      placeholder: https://github.com/organisatie/mijn-plugin
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Beschrijving
+      description: Wat doet de plugin? Welke skills/commands/agents bevat deze?
+    validations:
+      required: true
+
+  - type: input
+    id: author
+    attributes:
+      label: Organisatie / auteur
+      description: Naam van de organisatie of auteur
+    validations:
+      required: true
+
+  - type: input
+    id: contact
+    attributes:
+      label: Contact email
+      description: Email voor vragen over de plugin
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Versie
+      description: Huidige versie van de plugin (semver)
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: license
+    attributes:
+      label: Licentie
+      options:
+        - EUPL-1.2
+        - Apache-2.0
+        - MIT
+        - GPL-3.0
+        - Anders (vermeld in beschrijving)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: De repository is publiek toegankelijk
+          required: true
+        - label: Er is een geldige `.claude-plugin/plugin.json` aanwezig
+          required: true
+        - label: De plugin bevat minimaal 1 werkende skill, command of agent
+          required: true
+        - label: Er is een README met installatie-instructies
+          required: true
+        - label: Er is een open-source licentie
+          required: true
