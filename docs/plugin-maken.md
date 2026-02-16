@@ -94,15 +94,22 @@ claude plugin validate ./mijn-plugin
 
 ## Bestaande skills migreren
 
-Heb je al `.claude/skills/` in je project? Zo migreer je ze naar een plugin:
+Heb je al `.claude/skills/` in je project? Je kunt ze **in-place** omzetten naar plugin-formaat zonder ze te verplaatsen:
 
-1. Maak `.claude-plugin/plugin.json` aan (zie stap 2)
-2. Verplaats of kopieer skills van `.claude/skills/` naar `skills/`
-3. Voeg YAML frontmatter toe aan elke SKILL.md (naam, beschrijving, model, allowed-tools)
-4. Hernoem `skill-naam.md` naar `skills/skill-naam/SKILL.md`
-5. Test lokaal met `--plugin-dir`
+1. Maak `.claude-plugin/plugin.json` aan met een `skills` veld dat naar `.claude/skills/` verwijst:
+   ```json
+   {
+     "name": "mijn-plugin",
+     "description": "Beschrijving",
+     "version": "1.0.0",
+     "skills": "./.claude/skills/"
+   }
+   ```
+2. Zet elke `skill-naam.md` om naar een directory `skill-naam/SKILL.md`
+3. Voeg YAML frontmatter toe aan elke SKILL.md (name, description, model, allowed-tools)
+4. Test lokaal met `--plugin-dir`
 
-De oorspronkelijke `.claude/skills/` kun je behouden voor project-lokaal gebruik.
+Zo heb je **één locatie** voor skills die zowel lokaal in het project als via de marketplace werkt. Zie [zad-actions](https://github.com/RijksICTGilde/zad-actions) voor een werkend voorbeeld.
 
 ## Meer informatie
 
