@@ -1,45 +1,36 @@
 # Overheid Claude Plugins
 
 [![EUPL-1.2](https://img.shields.io/badge/licentie-EUPL--1.2-blue.svg)](LICENSE)
+[![plugins](https://img.shields.io/badge/plugins-2-green.svg)](#beschikbare-plugins)
+[![CI](https://github.com/MinBZK/overheid-claude-plugins/actions/workflows/validate.yml/badge.svg)](https://github.com/MinBZK/overheid-claude-plugins/actions/workflows/validate.yml)
 
 Centrale catalogus van [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugins voor de Nederlandse overheid. Via deze marketplace kunnen overheidsteams hun Claude Code plugins publiceren en ontdekken.
 
-## Installatie
-
-Voeg de marketplace toe aan Claude Code:
+## Snel starten
 
 ```bash
+# 1. Voeg de marketplace toe
 claude plugin marketplace add MinBZK/overheid-claude-plugins
-```
 
-Bekijk beschikbare plugins:
-
-```bash
-claude plugin list --marketplace overheid-plugins
-```
-
-Installeer een plugin:
-
-```bash
+# 2. Installeer een plugin
 claude plugin install logius-standaarden@overheid-plugins
 ```
 
 ## Beschikbare plugins
 
-| Plugin | Beschrijving | Maintainer |
-|--------|-------------|------------|
-| [logius-standaarden](https://github.com/MinBZK/logius-standaarden-plugin) | 10 skills voor 88 Logius standaarden repositories (API Design Rules, Digikoppeling, OAuth NL, FSC, CloudEvents, BOMOS, en meer) | Logius |
-| [zad-actions](https://github.com/RijksICTGilde/zad-actions) | 3 skills voor ZAD deployment: linting, releases en GitHub Actions validatie | Rijks ICT Gilde |
+| Plugin | Skills | Beschrijving | Maintainer |
+|--------|--------|-------------|------------|
+| [logius-standaarden](https://github.com/MinBZK/logius-standaarden-plugin) | 10 | Skills voor 88 Logius standaarden repositories: API Design Rules, Digikoppeling, OAuth NL, FSC, CloudEvents, BOMOS, en meer | [Logius](https://github.com/logius-standaarden) |
+| [zad-actions](https://github.com/RijksICTGilde/zad-actions) | 3 | Skills voor ZAD deployment: linting, releases en GitHub Actions validatie | [Rijks ICT Gilde](https://github.com/RijksICTGilde) |
 
 ## Plugin toevoegen
 
-Wil je een plugin toevoegen aan deze marketplace? Zie [docs/plugin-toevoegen.md](docs/plugin-toevoegen.md) voor de stappen.
+Heb je een Claude Code plugin die relevant is voor de Nederlandse overheid? Voeg hem toe aan deze marketplace:
 
-Wil je eerst een plugin bouwen? Zie [docs/plugin-maken.md](docs/plugin-maken.md) voor een handleiding.
+1. **Plugin bouwen** - Zie [docs/plugin-maken.md](docs/plugin-maken.md) voor een stap-voor-stap handleiding
+2. **Plugin aanmelden** - Zie [docs/plugin-toevoegen.md](docs/plugin-toevoegen.md) of open een [issue](../../issues/new?template=plugin-aanmelding.yml)
 
-## Kwaliteitseisen
-
-Plugins in deze marketplace moeten voldoen aan:
+### Kwaliteitseisen
 
 - Open-source licentie (EUPL-1.2, Apache-2.0, MIT, of vergelijkbaar)
 - Publieke GitHub repository
@@ -48,6 +39,16 @@ Plugins in deze marketplace moeten voldoen aan:
 - Nederlandse of tweetalige documentatie
 
 Zie [CONTRIBUTING.md](CONTRIBUTING.md) voor het volledige review-proces.
+
+## Structuur
+
+```
+.claude-plugin/
+  marketplace.json      # Catalogus met alle plugins
+docs/
+  plugin-maken.md       # Handleiding: plugin bouwen
+  plugin-toevoegen.md   # Handleiding: plugin registreren
+```
 
 ## Licentie
 
