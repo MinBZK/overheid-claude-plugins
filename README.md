@@ -16,6 +16,8 @@ claude plugin marketplace add MinBZK/overheid-claude-plugins
 claude plugin install logius-standaarden@overheid-plugins
 ```
 
+![Demo: plugin installeren en browsen](docs/demo.gif)
+
 ## Beschikbare plugins
 
 | Plugin | Skills | Beschrijving | Maintainer |
