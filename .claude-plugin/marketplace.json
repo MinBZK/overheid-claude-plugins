@@ -53,6 +53,21 @@
       },
       "category": "productivity",
       "tags": ["overheid", "developer", "api", "security", "open-source", "nl-design-system", "standaarden"]
+    },
+    {
+      "name": "nerds",
+      "description": "Skills voor de Nederlandse Richtlijn Digitale Systemen (NeRDS): 13 richtlijnen voor het ontwerpen, ontwikkelen en inkopen van digitale systemen bij de overheid (gebruikersbehoeften, toegankelijkheid, open source, cloud, veiligheid, privacy, en meer)",
+      "version": "0.1.0",
+      "author": {
+        "name": "MinBZK",
+        "email": ""
+      },
+      "source": {
+        "source": "github",
+        "repo": "MinBZK/NeRDS"
+      },
+      "category": "productivity",
+      "tags": ["overheid", "richtlijnen", "nerds", "toegankelijkheid", "open-source", "cloud", "privacy", "veiligheid", "duurzaamheid"]
     }
   ]
 }
