@@ -27,7 +27,7 @@
     {
       "name": "zad-actions",
       "description": "Skills voor ZAD deployment: linting, releases, action validatie, workflow generatie en deployment debugging voor Zelfservice voor Applicatie Deployment",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "author": {
         "name": "Rijks ICT Gilde",
         "email": "ictgilde@minbzk.nl"
@@ -57,7 +57,7 @@
     {
       "name": "nerds",
       "description": "Skills voor de Nederlandse Richtlijn Digitale Systemen (NeRDS): 13 richtlijnen voor het ontwerpen, ontwikkelen en inkopen van digitale systemen bij de overheid (gebruikersbehoeften, toegankelijkheid, open source, cloud, veiligheid, privacy, en meer)",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "author": {
         "name": "MinBZK",
         "email": ""
