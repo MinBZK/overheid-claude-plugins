@@ -22,7 +22,7 @@ claude plugin install logius-standaarden@overheid-plugins
 
 | Plugin | Skills | Beschrijving | Maintainer |
 |--------|--------|-------------|------------|
-| [logius-standaarden](https://github.com/MinBZK/logius-standaarden-plugin) | 10 | Skills voor 88 Logius standaarden repositories: API Design Rules, Digikoppeling, OAuth NL, FSC, CloudEvents, BOMOS, en meer | [MinBZK](https://github.com/MinBZK) |
+| [logius-standaarden](https://github.com/MinBZK/logius-standaarden-plugin) | 10 | Skills voor 77 Logius standaarden repositories: API Design Rules, Digikoppeling, OAuth NL, FSC, CloudEvents, BOMOS, en meer | [MinBZK](https://github.com/MinBZK) |
 | [zad-actions](https://github.com/RijksICTGilde/zad-actions) | 5 | Skills voor ZAD deployment: linting, releases, action validatie, workflow generatie en debugging | [Rijks ICT Gilde](https://github.com/RijksICTGilde) |
 | [developer-overheid](https://github.com/dstotijn/developer-overheid-nl-agent-skills) | 9 | Kennisbank van developer.overheid.nl: richtlijnen en standaarden voor overheidssoftwareontwikkeling (API's, data, frontend, infra, security, open source) | [David Stotijn](https://github.com/dstotijn) |
 | [nerds](https://github.com/MinBZK/NeRDS) | 14 | Skills voor de Nederlandse Richtlijn Digitale Systemen (NeRDS): 13 richtlijnen voor ontwerpen, ontwikkelen en inkopen van digitale systemen (toegankelijkheid, open source, cloud, veiligheid, privacy, en meer) | [MinBZK](https://github.com/MinBZK) |
