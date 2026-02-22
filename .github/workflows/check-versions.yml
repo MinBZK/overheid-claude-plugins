@@ -1,0 +1,231 @@
+name: Controleer plugin versies
+
+on:
+  schedule:
+    - cron: '0 8 * * 1-5'  # Werkdagen 08:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Controleer upstream versies en maak PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 << 'SCRIPT'
+          import json, subprocess, sys, base64, os, hashlib
+
+          marketplace_path = '.claude-plugin/marketplace.json'
+
+          with open(marketplace_path) as f:
+              data = json.load(f)
+
+          updates = []
+          summary_lines = []
+
+          for plugin in data.get('plugins', []):
+              name = plugin.get('name', '?')
+              local_version = plugin.get('version', '')
+              source = plugin.get('source', {})
+
+              # Bepaal repo
+              if isinstance(source, dict) and source.get('source') == 'github':
+                  repo = source['repo']
+              elif isinstance(source, dict) and source.get('source') == 'url':
+                  url = source.get('url', '')
+                  if 'github.com' in url:
+                      repo = url.split('github.com/')[-1].replace('.git', '')
+                  else:
+                      msg = f"SKIP: {name} - geen GitHub URL"
+                      print(msg)
+                      summary_lines.append(msg)
+                      continue
+              else:
+                  msg = f"SKIP: {name} - onbekend source type"
+                  print(msg)
+                  summary_lines.append(msg)
+                  continue
+
+              # Haal upstream plugin.json op
+              result = subprocess.run(
+                  ['gh', 'api', f'repos/{repo}/contents/.claude-plugin/plugin.json',
+                   '--jq', '.content'],
+                  capture_output=True, text=True
+              )
+              if result.returncode != 0:
+                  msg = f"WAARSCHUWING: {name} - kan plugin.json niet ophalen uit {repo}"
+                  print(msg)
+                  summary_lines.append(msg)
+                  continue
+
+              try:
+                  content = base64.b64decode(result.stdout.strip()).decode('utf-8')
+                  upstream = json.loads(content)
+                  upstream_version = upstream.get('version', '')
+              except (json.JSONDecodeError, ValueError) as e:
+                  msg = f"WAARSCHUWING: {name} - kan plugin.json niet parsen: {e}"
+                  print(msg)
+                  summary_lines.append(msg)
+                  continue
+
+              if upstream_version and upstream_version != local_version:
+                  msg = f"UPDATE: {name} {local_version} -> {upstream_version}"
+                  print(msg)
+                  summary_lines.append(msg)
+                  updates.append({
+                      'name': name,
+                      'repo': repo,
+                      'old_version': local_version,
+                      'new_version': upstream_version,
+                  })
+              else:
+                  msg = f"OK: {name} v{local_version}"
+                  print(msg)
+                  summary_lines.append(msg)
+
+          # Schrijf job summary
+          summary_file = os.environ.get('GITHUB_STEP_SUMMARY', '')
+          if summary_file:
+              with open(summary_file, 'a') as f:
+                  f.write("## Plugin versie-check resultaten\n\n")
+                  for line in summary_lines:
+                      emoji = "✅" if line.startswith("OK:") else "🔄" if line.startswith("UPDATE:") else "⚠️"
+                      f.write(f"- {emoji} {line}\n")
+                  f.write("\n")
+
+          if not updates:
+              print("\nAlle plugin versies zijn actueel")
+              if summary_file:
+                  with open(summary_file, 'a') as f:
+                      f.write("**Geen updates nodig.**\n")
+              sys.exit(0)
+
+          # Controleer of er al een open PR is op een automated/ branch
+          result = subprocess.run(
+              ['gh', 'pr', 'list', '--state', 'open', '--head', 'automated/',
+               '--json', 'number,title,headRefName'],
+              capture_output=True, text=True
+          )
+          if result.returncode == 0 and result.stdout.strip():
+              prs = json.loads(result.stdout)
+              bump_prs = [pr for pr in prs if pr['headRefName'].startswith('automated/bump-')]
+              if bump_prs:
+                  pr = bump_prs[0]
+                  print(f"\nEr is al een open bump PR: #{pr['number']} ({pr['title']})")
+                  print("Geen nieuwe PR aangemaakt")
+                  if summary_file:
+                      with open(summary_file, 'a') as f:
+                          f.write(f"**Bestaande open PR gevonden: #{pr['number']}** - geen nieuwe PR aangemaakt.\n")
+                  sys.exit(0)
+
+          # Werk marketplace.json bij
+          for update in updates:
+              for plugin in data['plugins']:
+                  if plugin['name'] == update['name']:
+                      plugin['version'] = update['new_version']
+
+          with open(marketplace_path, 'w') as f:
+              json.dump(data, f, indent=2, ensure_ascii=False)
+              f.write('\n')
+
+          # Maak branch naam met unieke hash om collisions te voorkomen
+          if len(updates) == 1:
+              u = updates[0]
+              branch = f"automated/bump-{u['name']}-v{u['new_version']}"
+              title = f"Bump {u['name']} plugin naar v{u['new_version']}"
+          else:
+              names_hash = hashlib.sha1(
+                  "-".join(sorted(f"{u['name']}-{u['new_version']}" for u in updates)).encode()
+              ).hexdigest()[:8]
+              branch = f"automated/bump-plugin-versies-{names_hash}"
+              title = f"Bump {len(updates)} plugin versies"
+
+          # Maak PR body
+          body_lines = ["## Automatische versie-update\n"]
+          body_lines.append("| Plugin | Oud | Nieuw | Repo |")
+          body_lines.append("|--------|-----|-------|------|")
+          for u in updates:
+              repo_url = f"https://github.com/{u['repo']}"
+              changelog_url = f"{repo_url}/releases"
+              body_lines.append(
+                  f"| {u['name']} | {u['old_version']} | "
+                  f"[{u['new_version']}]({changelog_url}) | "
+                  f"[{u['repo']}]({repo_url}) |"
+              )
+          body_lines.append("")
+          body_lines.append("### Review checklist")
+          body_lines.append("- [ ] Versie-nummers kloppen met upstream")
+          body_lines.append("- [ ] Geen breaking changes in de nieuwe versies")
+          body_lines.append("- [ ] Changelog upstream bekeken")
+          body_lines.append("- [ ] Plugin-inhoud in marketplace komt overeen met upstream")
+          body_lines.append("")
+          body_lines.append("> **Let op:** Deze PR werkt alleen het versienummer in "
+                            "marketplace.json bij. Controleer of de plugin-inhoud "
+                            "(skills, commands, etc.) ook actueel is.")
+          body_lines.append("")
+          body_lines.append("---")
+          body_lines.append("*Deze PR is automatisch aangemaakt door de "
+                            "[check-versions workflow]"
+                            "(.github/workflows/check-versions.yml).*")
+          body = "\n".join(body_lines)
+
+          # Git configuratie
+          subprocess.run(['git', 'config', 'user.name', 'github-actions[bot]'], check=True)
+          subprocess.run(['git', 'config', 'user.email',
+                          'github-actions[bot]@users.noreply.github.com'], check=True)
+
+          # Branch aanmaken en wijzigingen committen
+          subprocess.run(['git', 'checkout', '-b', branch], check=True)
+          subprocess.run(['git', 'add', marketplace_path], check=True)
+
+          if len(updates) == 1:
+              u = updates[0]
+              commit_msg = f"Bump {u['name']} plugin naar v{u['new_version']}"
+          else:
+              names = ", ".join(u['name'] for u in updates)
+              commit_msg = f"Bump plugin versies: {names}"
+
+          subprocess.run(['git', 'commit', '-m', commit_msg], check=True)
+
+          push_result = subprocess.run(
+              ['git', 'push', '-u', 'origin', branch],
+              capture_output=True, text=True
+          )
+          if push_result.returncode != 0:
+              print(f"FOUT: git push mislukt: {push_result.stderr}")
+              sys.exit(1)
+
+          # Zorg dat het label bestaat
+          subprocess.run(
+              ['gh', 'label', 'create', 'automated-bump',
+               '--description', 'Automatische versie-bump PR',
+               '--color', '0e8a16', '--force'],
+              capture_output=True, text=True
+          )
+
+          # PR aanmaken
+          result = subprocess.run(
+              ['gh', 'pr', 'create',
+               '--title', title,
+               '--body', body,
+               '--label', 'automated-bump'],
+              capture_output=True, text=True
+          )
+          if result.returncode != 0:
+              print(f"FOUT: PR aanmaken mislukt: {result.stderr}")
+              sys.exit(1)
+
+          pr_url = result.stdout.strip()
+          print(f"\nPR aangemaakt: {pr_url}")
+
+          if summary_file:
+              with open(summary_file, 'a') as f:
+                  f.write(f"**PR aangemaakt:** {pr_url}\n")
+          SCRIPT
