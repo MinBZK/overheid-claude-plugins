@@ -5,6 +5,12 @@ Alle noemenswaardige wijzigingen aan deze marketplace worden hier gedocumenteerd
 Het formaat is gebaseerd op [Keep a Changelog](https://keepachangelog.com/nl/1.1.0/)
 en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
+## [Unreleased]
+
+### Toegevoegd
+
+- CI workflow voor automatische plugin versie-checks (dagelijks, maakt PR bij versie-drift)
+
 ## [1.0.0] - 2026-02-16
 
 ### Toegevoegd
