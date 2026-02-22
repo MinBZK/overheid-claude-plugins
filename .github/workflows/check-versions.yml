@@ -20,7 +20,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 << 'SCRIPT'
-          import json, subprocess, sys, base64, os, hashlib
+          import json, subprocess, sys, base64, os, hashlib, re
 
           marketplace_path = '.claude-plugin/marketplace.json'
 
@@ -107,9 +107,9 @@ jobs:
                       f.write("**Geen updates nodig.**\n")
               sys.exit(0)
 
-          # Controleer of er al een open PR is op een automated/ branch
+          # Controleer of er al een open PR is met het automated-bump label
           result = subprocess.run(
-              ['gh', 'pr', 'list', '--state', 'open', '--head', 'automated/',
+              ['gh', 'pr', 'list', '--state', 'open', '--label', 'automated-bump',
                '--json', 'number,title,headRefName'],
               capture_output=True, text=True
           )
@@ -136,9 +136,15 @@ jobs:
               f.write('\n')
 
           # Maak branch naam met unieke hash om collisions te voorkomen
+          def sanitize_branch(s):
+              """Verwijder ongeldige git branch tekens."""
+              return re.sub(r'[^a-zA-Z0-9._-]', '-', s)
+
           if len(updates) == 1:
               u = updates[0]
-              branch = f"automated/bump-{u['name']}-v{u['new_version']}"
+              safe_name = sanitize_branch(u['name'])
+              safe_version = sanitize_branch(u['new_version'])
+              branch = f"automated/bump-{safe_name}-v{safe_version}"
               title = f"Bump {u['name']} plugin naar v{u['new_version']}"
           else:
               names_hash = hashlib.sha1(
